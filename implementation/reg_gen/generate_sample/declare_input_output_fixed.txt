@@ -1,0 +1,7 @@
+//-----------------------
+//#--> regiter interface
+reg_addr_i
+reg_wr_en_i
+reg_wr_data_i
+reg_rd_en_i
+reg_rd_data_o

@@ -1,0 +1,3 @@
+//-----------------------
+//#--> addr = @reg_addr@
+@reg_name@_@reg_field@_o

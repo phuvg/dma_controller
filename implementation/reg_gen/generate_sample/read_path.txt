@@ -1,0 +1,11 @@
+//-----------------------
+//read path
+//-----------------------
+always @(*) begin
+    case(reg_addr_i):
+        8'h@reg_addr@: reg_rd_data = {@reg_name@_@reg_field@};
+        default: 32'h0;
+    endcase
+end
+
+assign reg_rd_data_o = reg_rd_data;

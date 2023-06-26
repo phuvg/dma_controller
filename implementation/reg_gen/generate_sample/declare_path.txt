@@ -1,0 +1,6 @@
+//#--> addr = @reg_addr@
+@reg_name@_sel
+@reg_name@_rd_en
+@reg_name@_wr_en
+nxt_@reg_name@_@reg_field@
+@reg_name@_@reg_field@
