@@ -2,10 +2,18 @@
 //read path
 //-----------------------
 always @(*) begin
-    case(reg_addr_i):
-        8'h@reg_addr@: reg_rd_data = {@reg_name@_@reg_field@};
-        default: 32'h0;
+    case(reg_addr_i)
+        16'h@reg_addr@: nxt_reg_rd_data = {@reg_name@_@reg_field@};
+        default: nxt_reg_rd_data = {(DATA_WIDTH){1'b0}};
     endcase
+end
+
+always @(posedge clk or negedge rstn) begin
+    if(~rstn) begin
+        reg_rd_data <= 32'h0;
+    end else begin
+        reg_rd_data <= {(DATA_WIDTH){reg_rd_en_i}} & nxt_reg_rd_data;
+    end
 end
 
 assign reg_rd_data_o = reg_rd_data;

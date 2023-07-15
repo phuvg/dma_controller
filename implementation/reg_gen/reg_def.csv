@@ -1,5 +1,5 @@
 #,Register Address,Register Name,Default Value,R/W Property,Register Description
-#,addr = 0x00,CDMAControl,,,
+#,addr = 0x0000,CDMAControl,,,
 ,[31:24],IRQDelay,8'h00,r/w,Interrupt Delay Timeout. This value is used for setting
 ,,,,,the interrupt delay timeout value. The interrupt timeout
 ,,,,,is a mechanism for causing the CDMA engine to generate
@@ -84,7 +84,7 @@
 ,,,,,included. If the CDMA is built with SG disabled (Simple
 ,,,,,"Mode Only), the default value of the port is 0"
 ,0,Reserved,1'h0,ro,"Writing to these bits has no effect, and they are always"
-#,addr = 0x04,CDMAStatus,,,
+#,addr = 0x0004,CDMAStatus,,,
 ,[31:24],IRQDelaySts,8'h00,ro,Interrupt Delay Time Status. This field reflects
 ,,,,,the current interrupt delay timer value in the SG
 ,,,,,Engine
@@ -249,3 +249,615 @@
 ,,,,,not started.
 ,0,Reserved,1'h0,ro,Writing to these bits has no effect and they are
 ,,,,,always read as zeros.
+#,addr = 0x0008,CDMACurDescPntr,,,
+,[31:6],Cur_Desc_Pntr,26'h0,r/w,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,current descriptor being worked on. This register must
+,,,,,contain a pointer to a valid descriptor prior to writing to
+,,,,,the TAILDESC_PTR register. Failure to do so results in an
+,,,,,undefined operation by the CDMA.
+,,,,,When the CDMA SG Engine is running (CDMASR.IDLE =
+,,,,,"0), the CURDESC_PNTR register is updated by the SG"
+,,,,,Engine to reflect the starting address of the current
+,,,,,descriptor being executed.
+,,,,,"On error detection, the CURDESC_PNTR register is"
+,,,,,updated to reflect the descriptor associated with the
+,,,,,detected error.
+,,,,,The register should only be written by the software
+,,,,,application when the AXI CDMA is idle (CDMASR.IDLE =
+,,,,,1). Descriptor addresses written to this field must be
+,,,,,aligned to 64-byte boundaries (sixteen 32-bit words).
+,,,,,"Examples are 0x00, 0x40, 0x80. For 64byte alignment bits"
+,,,,,[5:0] should be 0. Any other alignment has undefined
+,,,,,results.
+,,,,,This register is cleared when CDMACR.SGMode = 0.
+,[5:0],Reserved,6'h0,ro,Writing to these bits has no effect and they are always
+,,,,,read as zeros.
+#,addr = 0x000c,CDMACurDescPntrMSB,,,
+,[31:0,Cur_Desc_Pntr,32'h0,r/w,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,current descriptor being worked on. This register must
+,,,,,contain a pointer to a valid descriptor prior to writing to
+,,,,,the TAILDESC_PTR register. Failure to do so results in an
+,,,,,undefined operation by the CDMA.
+,,,,,When the CDMA SG Engine is running (CDMASR.IDLE =
+,,,,,"0), the CURDESC_PNTR register is updated by the SG"
+,,,,,Engine to reflect the starting address of the current
+,,,,,descriptor being executed.
+,,,,,"On error detection, the CURDESC_PNTR register is"
+,,,,,updated to reflect the descriptor associated with the
+,,,,,detected error.
+,,,,,The register should only be written by the software
+,,,,,application when the AXI CDMA is idle (CDMASR.IDLE =
+,,,,,1). Descriptor addresses written to this field must be
+,,,,,aligned to 64-byte boundaries (sixteen 32-bit words).
+,,,,,"Examples are 0x00, 0x40, 0x80. Any other alignment has"
+,,,,,undefined results.
+,,,,,This register is cleared when CDMACR.SGMode = 0.
+#,addr = 0x0010,CDMATailDescPntr,,,
+,[31:6],Tail_Desc_Pntr,26'h0,r/w,Tail Descriptor Pointer. Indicates pause pointer for
+,,,,,descriptor chain execution. The AXI CDMA SG
+,,,,,Engine pauses descriptor fetching after completing
+,,,,,operations on the descriptor whose current
+,,,,,descriptor pointer matches the tail descriptor
+,,,,,"pointer. Like Current descriptor, this too shall be"
+,,,,,64byte aligned.
+,,,,,When the AXI CDMA is in SG Mode and the address
+,,,,,"space is 32 bits (CDMACR.SGMode = 1), a write by"
+,,,,,the software application to the TAILDESC_PNTR (in
+,,,,,case of 32 bit mode) register causes the AXI CDMA
+,,,,,SG Engine to start fetching descriptors starting from
+,,,,,the CURDESC_PNTR register value. If the SG engine
+,,,,,"is paused at a tail pointer pause point, the SG engine"
+,,,,,restarts descriptor execution at the next sequential
+,,,,,transfer descriptor. If the AXI CDMA is not idle
+,,,,,"(CDMASR.IDLE = 0), writing to the TAILDESC_PNTR"
+,,,,,has no effect except to reposition the SG pause
+,,,,,point.
+,,,,,This register is cleared when CDMACR.SGMode = 0.
+,[5:0],Reserved,6'h0,ro,Writing to these bits has no effect and they are always
+,,,,,read as zeros.
+#,addr = 0x0014,CDMATailDescPntrMSB,,,
+,[31:0],Tail_Desc_Pntr,32'h0,r/w,Tail Descriptor Pointer. Indicates pause pointer for
+,,,,,descriptor chain execution. The AXI CDMA SG
+,,,,,Engine pauses descriptor fetching after completing
+,,,,,operations on the descriptor whose current
+,,,,,descriptor pointer matches the tail descriptor
+,,,,,pointer.
+,,,,,"When the AXI CDMA is in SG Mode, and the address"
+,,,,,"space is more than 32 bits, (CDMACR.SGMode = 1),"
+,,,,,a write by the software application to the
+,,,,,TAILDESC_PNTR_MSB (in 64 bit mode) register
+,,,,,causes the AXI CDMA SG Engine to start fetching
+,,,,,descriptors starting from the CURDESC_PNTR
+,,,,,register value. If the SG engine is paused at a tail
+,,,,,"pointer pause point, the SG engine restarts"
+,,,,,descriptor execution at the next sequential transfer
+,,,,,descriptor. If the AXI CDMA is not idle
+,,,,,"(CDMASR.IDLE = 0), writing to the TAILDESC_PNTR"
+,,,,,has no effect except to reposition the SG pause
+,,,,,point.
+,,,,,This register is cleared when CDMACR.SGMode = 0.
+#,addr = 0x0018,CDMASA,,,
+,[31:0],Source_Address,32'h0,r/w,Source Address Register. This register is used by Simple
+,,,,,DMA operations (CDMACR.SGMode = 0) as the starting read
+,,,,,address for DMA data transfers.
+,,,,,The software application should only write to this register
+,,,,,when the AXI CDMA is idle (CDMASR.IDLE = 1).
+#,addr = 0x001c,CDMASAMSB,,,
+,[31:0],Source_Address,32'h0,r/w,Source Address Register. This register is used by Simple
+,,,,,DMA operations (CDMACR.SGMode = 0) as the starting read
+,,,,,address for DMA data transfers. The address value written
+,,,,,can be at any byte offset.
+,,,,,The software application should only write to this register
+,,,,,when the AXI CDMA is idle (CDMASR.IDLE = 1).
+#,addr = 0x0020,CDMADA,,,
+,[31:0],Destination_Address,32'h0,ro,Destination Address Register. This register is used by
+,,,,,Simple DMA operations as the starting write address for
+,,,,,DMA data transfers. The address value written has
+,,,,,restrictions relative to the Source Address and Data
+,,,,,Realignment Engine (DRE) inclusion as follows.
+,,,,,"If DRE is not included in the AXI CDMA, then the address"
+,,,,,offset of the Destination address must match that of the
+,,,,,Source Address register value. Offset is defined as that
+,,,,,portion of a system address that is used to designate a byte
+,,,,,"position within a single data beat width. For example, a"
+,,,,,32-bit data bus has four addressable byte positions within a
+,,,,,"single data beat (0, 1, 2, and 3). The portion of the address"
+,,,,,that designates these positions is the offset. The number of
+,,,,,address bits used for the offset varies with the transfer bus
+,,,,,data width.
+,,,,,The software application should only write to this register
+,,,,,when the AXI CDMA is idle (CDMASR.IDLE = 1).
+#,addr = 0x0024,CDMADAMSB,,,
+,[31:0],Destination_Address,32'h0,ro,Destination Address Register. This register is used by
+,,,,,Simple DMA operations as the starting write address for
+,,,,,DMA data transfers. The software application should only
+,,,,,write to this register when the AXI CDMA is idle
+,,,,,(CDMASR.IDLE = 1).
+#,addr = 0x0028,CDMABTT,,,
+,[31:26],Reserved,6'h0,ro,"Writing to these bits has no effect, and they are always"
+,,,,,read as zeros.
+,[25:0],Bytes_To_Transfer,26'h0,r/w,Bytes to Transfer. This register field is used for Simple
+,,,,,DMA transfers and indicates the desired number of bytes
+,,,,,to DMA from the Source Address to the Destination
+,,,,,"Address. A maximum of 67,108,863 bytes of data can be"
+,,,,,specified by this field for the associated transfer.
+,,,,,Writing to the BTT register also initiates the Simple DMA
+,,,,,transfer.
+#,addr = 0x002c,CDMARSV,,,
+,[31:0],Reserved,32'h0,ro,Reserved for CDMA register
+#,addr = 0x0030,MAINCFG,,,
+,[31:9],Reserved,23'h0,ro,Reserved
+,8,dma_en,1'h0,r/w,1'b1 : Enable DMA engine.
+,,,,,Writing 1'b0 to this bit will pause DMA engine.
+,[7:0],ch_int_en,8'h0,r/w,Writing 1'b1 to these bit will enable interrupt generation for each channel.
+,,,,,[0] : Interrupt enable for channel 0.
+,,,,,[1] : Interrupt enable for channel 1.
+,,,,,[2] : Interrupt enable for channel 2.
+,,,,,[3] : Interrupt enable for channel 3.
+,,,,,[4] : Interrupt enable for channel 4.
+,,,,,[5] : Interrupt enable for channel 5.
+,,,,,[6] : Interrupt enable for channel 6.
+,,,,,[7] : Interrupt enable for channel 7.
+#,addr = 0x0034,MAINDMASTT,,,
+,[31:9],Reserved,23'h0,ro,Reserved
+,8,dma_busy,1'h0,ro,1'b1 : DMA engine is busy.
+,[7:0],ch_int_en,8'h0,ro,[0] : Interrupt source of channel 0.
+,,,,,[1] : Interrupt source of channel 1.
+,,,,,[2] : Interrupt source of channel 2.
+,,,,,[3] : Interrupt source of channel 3.
+,,,,,[4] : Interrupt source of channel 4.
+,,,,,[5] : Interrupt source of channel 5.
+,,,,,[6] : IInterrupt source of channel 6.
+,,,,,[7] : Interrupt source of channel 7.
+#,addr = 0x0038,MAINRSV0,,,
+,[31:0],Reserved,32'h0,ro,Reserved
+#,addr = 0x003c,MAINRSV1,,,
+,[31:0],Reserved,32'h0,ro,Reserved
+#,addr = 0x0040,CRCH0,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x0044,SRCH0,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x0048,TSRCH0,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x004c,CDPRCH0,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x0050,SARCH0,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0054,DARCH0,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0060,CRCH1,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x0064,SRCH1,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x0068,TSRCH1,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x006c,CDPRCH1,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x0070,SARCH1,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0074,DARCH1,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0080,CRCH2,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x0084,SRCH2,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x0088,TSRCH2,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x008c,CDPRCH2,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x0090,SARCH2,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0094,DARCH2,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00a0,CRCH3,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x00a4,SRCH3,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x00a8,TSRCH3,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x00ac,CDPRCH3,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x00b0,SARCH3,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00b4,DARCH3,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00a0,CRCH4,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x00a4,SRCH4,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x00a8,TSRCH4,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x00ac,CDPRCH4,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x00b0,SARCH4,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00b4,DARCH4,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00c0,CRCH5,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Idle
+,,,,,1'b0 : busy.
+#,addr = 0x00c4,SRCH5,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x00c8,TSRCH5,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x00cc,CDPRCH5,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x00d0,SARCH5,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00d4,DARCH5,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00e0,CRCH6,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x00e4,SRCH6,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x00e8,TSRCH6,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x00ec,CDPRCH6,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x00f0,SARCH6,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x00f4,DARCH6,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0100,CRCH7,,,
+,[31:11],Reserved,21'h0,ro,Reserved
+,10,sw_reset,1'h0,r/w,Writing 1 to reset DMA channel.
+,[9:8],ch_pri,1'h0,r/w,Channel priority. 7 is highest priority.
+,[7:6],mode,2'h0,r/w,00 : normal mode.
+,,,,,01 : Hardware handshake mode.
+,,,,,10 : Linked list mode.
+,,,,,11 : Reserved.
+,5,inc_des,1'h0,r/w,0: Do not increment destination address.
+,,,,,1: Increment destination address.
+,4,inc_src,1'h0,r/w,0: Do not increment source address.
+,,,,,1: Increment source address.
+,3,done_int_en,1'h0,r/w,"Complete Interrupt Enable. When set to 1, it allows the"
+,,,,,channle to generate an interrupt when the transfer is done.
+,2,stop_err_int_en,1'h0,r/w,"Stop Error interrupt enable. When set to 1, it allows the"
+,,,,,channel to generate an Stop Error interrupt.
+,1,wtt_err_int_en,1'h0,r/w,Words to transfer error interrupt enable.
+,,,,,"When set to 1, it allows the channel to generate an interrupt "
+,,,,,if number of transferred words are zero.
+,0,ch_en,1'h0,r/w,Channel enabled.
+,,,,,1'b1 : Enable.
+,,,,,1'b0 : Disable.
+#,addr = 0x0104,SRCH7,,,
+,[31:4],Reserved,28'h0,ro,Reserved
+,3,done_irq,1'h0,ro,"Interrupt on Complete. When set to 1, this bit"
+,,,,,indicates an interrupt event has been generated
+,,,,,on completion of a DMA channel.If the corresponding enable 
+,,,,,"bit is set (done_int_en = 1), an interrupt out is generated."
+,,,,,0 = No Done Interrupt
+,,,,,1 = Done Interrupt active
+,,,,,Writing a 1 to this bit to clear it.
+,2,stop_err,1'h0,ro,Channel DMA is stop suddenly by sw reset or disable when the transfer is on going.
+,,,,,Writing a 1 to this bit to clear.
+,1,wtt_err,1'h0,ro,Words to transfer error. (In case words to transfer is zero).
+,,,,,Writing a 1 to this bit to clear.
+,0,ch_idle,1'h0,ro,1'b1 : Idle
+,,,,,1'b0 : busy.
+,,,,,When set the bit indicates the programmed transfer has
+,,,,,completed and the DMA channel is waiting for a new transfer to be programmed.
+#,addr = 0x0108,TSRCH7,,,
+,[31:8],Reserved,24'h0,ro,Reserved
+,[7:0],size,8'h0,r/w,Number of word (32bit) to transfer. Maximum size is 255 words.
+#,addr = 0x010c,CDPRCH7,,,
+,[31:4],cur_ptr,28'h0,ro,Current Descriptor Pointer. Indicates the pointer of the
+,,,,,"current descriptor being worked on. When the DMA Engine is running (idle = 0), this register is updated by the Lookup Descriptor Engine to reflect the starting address of the current descriptor being executed."
+,,,,,The register should only be written by the software
+,,,,,application when chanel is in idle state.
+,[3:0],Reserved,4'h0,ro,Reserved
+#,addr = 0x0110,SARCH7,,,
+,[31:0],sa,31'h0,r/w,Source Address Register. This register is used as the starting read address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.
+#,addr = 0x0114,DARCH7,,,
+,[31:0],da,31'h0,r/w,Destination Address Register. This register is used as the starting write address for DMA data transfers. The address value written must be aligned.
+,,,,,The software application should only write to this register
+,,,,,when the channel DMA is idle.

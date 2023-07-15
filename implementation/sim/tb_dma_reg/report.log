@@ -1,0 +1,95 @@
+# vsim -c -l report.log -voptargs="+acc" -do "run -all" work.tb_dma_reg 
+# Start time: 09:05:24 on Jul 15,2023
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# 
+# //  Questa Sim-64
+# //  Version 10.4c win64 Jul 20 2015
+# //
+# //  Copyright 1991-2015 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+# //  WHICH IS THE PROPERTY OF MENTOR GRAPHICS CORPORATION OR ITS
+# //  LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+# //  THIS DOCUMENT CONTAINS TRADE SECRETS AND COMMERCIAL OR FINANCIAL
+# //  INFORMATION THAT ARE PRIVILEGED, CONFIDENTIAL, AND EXEMPT FROM
+# //  DISCLOSURE UNDER THE FREEDOM OF INFORMATION ACT, 5 U.S.C. SECTION 552.
+# //  FURTHERMORE, THIS INFORMATION IS PROHIBITED FROM DISCLOSURE UNDER
+# //  THE TRADE SECRETS ACT, 18 U.S.C. SECTION 1905.
+# //
+# Loading work.tb_dma_reg(fast)
+# Loading work.dma_reg(fast)
+# run -all
+# all_reg 0000 ce683006 ce683006 TRUE
+# all_reg 0004 00017000 00017000 TRUE
+# all_reg 0008 be6aac00 be6aac00 TRUE
+# all_reg 000c 00000000 00000000 TRUE
+# all_reg 0010 2f592ec0 2f592ec0 TRUE
+# all_reg 0014 85938779 85938779 TRUE
+# all_reg 0018 a1c05284 a1c05284 TRUE
+# all_reg 001c 679adaad 679adaad TRUE
+# all_reg 0020 00000000 00000000 TRUE
+# all_reg 0024 00000000 00000000 TRUE
+# all_reg 0028 025e72f2 025e72f2 TRUE
+# all_reg 002c 00000000 00000000 TRUE
+# all_reg 0030 000000fb 000000fb TRUE
+# all_reg 0034 00000000 00000000 TRUE
+# all_reg 0038 00000000 00000000 TRUE
+# all_reg 003c 00000000 00000000 TRUE
+# all_reg 0040 0000034a 0000034a TRUE
+# all_reg 0044 00000000 00000000 TRUE
+# all_reg 0048 00000026 00000026 TRUE
+# all_reg 004c 00000000 00000000 TRUE
+# all_reg 0050 1cd9be69 1cd9be69 TRUE
+# all_reg 0054 dcec804b dcec804b TRUE
+# all_reg 0060 000002e8 000002e8 TRUE
+# all_reg 0064 00000000 00000000 TRUE
+# all_reg 0068 000000b8 000000b8 TRUE
+# all_reg 006c 00000000 00000000 TRUE
+# all_reg 0070 8c8f1ed9 8c8f1ed9 TRUE
+# all_reg 0074 ca26ca43 ca26ca43 TRUE
+# all_reg 0080 00000098 00000098 TRUE
+# all_reg 0084 00000000 00000000 TRUE
+# all_reg 0088 00000000 00000000 TRUE
+# all_reg 008c 00000000 00000000 TRUE
+# all_reg 0090 fe9e28eb fe9e28eb TRUE
+# all_reg 0094 d0478cf4 d0478cf4 TRUE
+# all_reg 00a0 000007d6 000007d6 TRUE
+# all_reg 00a4 00000000 00000000 TRUE
+# all_reg 00a8 00000074 00000074 TRUE
+# all_reg 00ac 00000000 00000000 TRUE
+# all_reg 00b0 5d90dcaf 5d90dcaf TRUE
+# all_reg 00b4 6e850c25 6e850c25 TRUE
+# all_reg 00a0 000007d6 000007d6 TRUE
+# all_reg 00a4 00000000 00000000 TRUE
+# all_reg 00a8 00000074 00000074 TRUE
+# all_reg 00ac 00000000 00000000 TRUE
+# all_reg 00b0 5d90dcaf 5d90dcaf TRUE
+# all_reg 00b4 6e850c25 6e850c25 TRUE
+# all_reg 00c0 00000727 00000727 TRUE
+# all_reg 00c4 00000000 00000000 TRUE
+# all_reg 00c8 0000006a 0000006a TRUE
+# all_reg 00cc 00000000 00000000 TRUE
+# all_reg 00d0 b813dcd7 b813dcd7 TRUE
+# all_reg 00d4 eddf6c33 eddf6c33 TRUE
+# all_reg 00e0 0000025c 0000025c TRUE
+# all_reg 00e4 00000000 00000000 TRUE
+# all_reg 00e8 00000011 00000011 TRUE
+# all_reg 00ec 00000000 00000000 TRUE
+# all_reg 00f0 c8fc6596 c8fc6596 TRUE
+# all_reg 00f4 c677a07c c677a07c TRUE
+# all_reg 0100 0000016c 0000016c TRUE
+# all_reg 0104 00000000 00000000 TRUE
+# all_reg 0108 00000003 00000003 TRUE
+# all_reg 010c 00000000 00000000 TRUE
+# all_reg 0110 e79bd301 e79bd301 TRUE
+# all_reg 0114 8d990267 8d990267 TRUE
+# ===================================
+# ==============SUMMARY==============
+# ===============PASS================
+# ==============PHUVUONG=============
+# ===================================
+# ** Note: $finish    : ../../tb/tb_dma_reg.v(1919)
+#    Time: 404 ns  Iteration: 0  Instance: /tb_dma_reg
+# End time: 09:05:24 on Jul 15,2023, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0

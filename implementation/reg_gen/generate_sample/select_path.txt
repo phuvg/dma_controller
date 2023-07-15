@@ -1,3 +1,3 @@
-assign @reg_name@_sel = (reg_addr_i[7:0] == 8'h@reg_addr@);
+assign @reg_name@_sel = (reg_addr_i[15:0] == 16'h@reg_addr@);
 assign @reg_name@_rd_en = @reg_name@_sel & reg_rd_en_i;
 assign @reg_name@_wr_en = @reg_name@_sel & reg_wr_en_i;

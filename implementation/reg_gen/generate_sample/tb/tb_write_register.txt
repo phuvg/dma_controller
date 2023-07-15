@@ -1,0 +1,9 @@
+//-----------------------
+//write path
+//#--> addr = @reg_addr@
+#(0.5*CLK_PERIOD);
+reg_addr_i = 16'h@reg_addr@;
+reg_wr_data_i = 32'b@random@;
+#(0.5*CLK_PERIOD) reg_wr_en_i = 1'b1;
+#(1*CLK_PERIOD) reg_wr_en_i = 1'b0;
+#(1*CLK_PERIOD);

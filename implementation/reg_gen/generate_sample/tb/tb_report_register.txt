@@ -1,0 +1,18 @@
+//-----------------------
+//report path
+//#--> addr = @reg_addr@
+task report_@reg_name@;
+    input [DATA_WIDTH-1:0] reg_rd_data_o;
+    input [DATA_WIDTH-1:0] written_data;
+    output false_enable;
+    begin
+        //tag addr reg_rd_data_o written_data checker
+        if(reg_rd_data_o == written_data) begin
+            $display("all_reg @reg_addr@ %h %h TRUE", reg_rd_data_o, written_data);
+            false_enable = 1'b0;
+        end else begin
+            $display("all_reg @reg_addr@ %h %h FALSE", reg_rd_data_o, written_data);
+            false_enable = 1'b1;
+        end
+    end
+endtask

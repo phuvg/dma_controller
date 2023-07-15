@@ -1,4 +1,4 @@
-assign nxt_@reg_name@_@reg_field@ = (@reg_name@_wr_en) ? reg_wr_data_i : @reg_name@_@reg_field@;
+assign nxt_@reg_name@_@reg_field@ = (@reg_name@_wr_en) ? reg_wr_data_i[@field_width@] : @reg_name@_@reg_field@;
 
 always @(posedge clk or negedge rstn) begin
     if(~rstn) begin

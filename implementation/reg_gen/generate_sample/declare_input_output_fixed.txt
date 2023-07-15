@@ -1,4 +1,8 @@
 //-----------------------
+//#--> clk and rstn
+clk
+rstn
+//-----------------------
 //#--> regiter interface
 reg_addr_i
 reg_wr_en_i

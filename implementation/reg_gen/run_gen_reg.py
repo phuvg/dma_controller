@@ -50,6 +50,7 @@ STR_ADDR = "@reg_addr@"
 STR_NAME = "@reg_name@"
 STR_FIELD = "@reg_field@"
 STR_DEFAULT = "@default_value@"
+STR_FIELDWIDTH = "@field_width@"
 
 REGTYPE_RW = "r/w"
 REGTYPE_RO = "ro"
@@ -136,6 +137,12 @@ def gen_tab(n):
         tmp += "\t"
     return tmp
 
+def is_final_write_field(index, list_field):
+    for i in range(index+1, len(list_field)-1, 1):
+        if(list_field[i].reg_property == REGTYPE_RW):
+            return False
+    return True
+
 def read_fixed_reg_interface():
     print(">>>> read_fixed_reg_interface >> run...")
     list_fixed_reg_interface = [] #--> return list
@@ -147,7 +154,12 @@ def read_fixed_reg_interface():
                 new_line = line.split("\n")[0] + "," + "\n"
                 list_fixed_reg_interface.append(add_level_line(new_line, 1))
             else:
-                list_fixed_reg_interface.append(add_level_line(line, 1))
+                #--> if not comment line
+                if(not line.startswith("//")):
+                    new_line = line.split("\n")[0] + "," + "\n"
+                    list_fixed_reg_interface.append(add_level_line(new_line, 1))
+                else:
+                    list_fixed_reg_interface.append(add_level_line(line, 1))
     print(">>>> read_fixed_reg_interface >> end")
     return list_fixed_reg_interface
 
@@ -177,8 +189,11 @@ def list_output_field(list_reg):
                     if(list_reg[i].list_field[j].reg_property == REGTYPE_RW):
                         temp = line.replace(STR_NAME, list_reg[i].name) #--> replace reg_name
                         temp = temp.replace(STR_FIELD, list_reg[i].list_field[j].name) #--> replace reg_field
+                        #--> if not final line: add ","
                         if(not (i==len(list_reg)-1 and j==len(list_reg[i].list_field)-1)):
-                            temp += ",\n" #--> add commas and enter if not the last signal
+                            #--> if after this field still has another write field
+                            if(not (i==len(list_reg)-1 and is_final_write_field(j, list_reg[i].list_field))):
+                                temp += ",\n" #--> add commas and enter if not the last signal
                         list_field_output_interface.append(add_level_line(temp, 1)) #--> append line with tab
             #--> add empty line
             list_field_output_interface.append("\n")
@@ -208,8 +223,12 @@ def declare_register_interface():
                 list_declare_reg_interface.append(add_level_line(line, 1) + "\n") #--> append line with tab level
             #--> signal line
             else:
+                #--> clk and rstn
+                if(line.startswith("clk") or line.startswith("rstn")):
+                    line = "input" + gen_tab(9) + line + ";\n"
+                    list_declare_reg_interface.append(add_level_line(line, 1)) #--> append line with tab level
                 #--> input
-                if(line.endswith("_i")):
+                elif(line.endswith("_i")):
                     tmp = line.replace("_i", "") #--> remove _i
                     #--> rd_en / wr_en
                     if(tmp.endswith("_en")):
@@ -414,6 +433,7 @@ def descript_write_path(list_reg):
                                 tmp = line.replace(STR_NAME, reg.name) #--> replace reg_name
                                 tmp = tmp.replace(STR_FIELD, field.name) #--> replace reg_field
                                 tmp = tmp.replace(STR_DEFAULT, field.default_value) #--> replace default_value
+                                tmp = tmp.replace(STR_FIELDWIDTH, field.width.replace("[", "").replace("]", "")) #--> replace default_value
                                 list_write_path.append(add_level_line(tmp, 1))
                     #--> else: keep line
                     else:
@@ -435,7 +455,7 @@ def descript_read_path(list_reg):
             if(line.count(STR_ADDR) > 0):
                 #--> read list_reg
                 for reg in list_reg:
-                    tmp = line.replace(STR_ADDR, reg.addr) #--> replace reg_addr
+                    tmp = line.replace(STR_ADDR, reg.addr.replace("0x", "")) #--> replace reg_addr
                     #--> read list_field
                     for i in range(0, len(reg.list_field), 1):
                         #--> if not last field
